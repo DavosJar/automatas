@@ -1,56 +1,58 @@
 package com.automatas.automatas.dominio;
 
-import com.automatas.automatas.dominio.automatas.Ciberseguridad;
-import com.automatas.automatas.dominio.automatas.Ecommerce;
-import com.automatas.automatas.dominio.automatas.LecturasIoT;
+import com.automatas.automatas.dominio.automata_deterministas.CiberseguridadDeteminista;
+import com.automatas.automatas.dominio.automatas_no_deterministas.Ciberseguridad;
+import com.automatas.automatas.dominio.operaciones.MinimizadorAFD;
+import com.automatas.automatas.dominio.operaciones.TransformadorAFN_AFD;
 
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("=== AUTÓMATA FINITO NO DETERMINISTA: CIBERSEGURIDAD ===\n");
-        pruebasCiberseguridad();
-        
-        System.out.println("\n=== AUTÓMATA FINITO NO DETERMINISTA: ECOMMERCE ===\n");
-        pruebasEcommerce();
-        
-        System.out.println("\n=== AUTÓMATA FINITO NO DETERMINISTA: LECTURAS IOT ===\n");
-        pruebasLecturasIoT();
+        System.out.println("=== COMPARATIVA CUÁDRUPLE: AFN vs AFD QUEMADO vs AFD TRANSFORMADO vs AFD MINIMIZADO ===\n");
+        comparativaCuadruple();
     }
 
-    private static void pruebasCiberseguridad() {
-        Ciberseguridad ciberseguridad = Ciberseguridad.crear();
-        
-        prueba(ciberseguridad, new String[]{"SYN", "ACK", "RST"}, true, "Three-way handshake válido");
-        prueba(ciberseguridad, new String[]{"SYN", "DATA", "RST"}, false, "DATA no permitido después de SYN");
-        prueba(ciberseguridad, new String[]{"SYN", "ACK", "ACK", "RST"}, true, "No determinismo: múltiples ACKs");
-    }
+    private static void comparativaCuadruple() {
+        Ciberseguridad afn = Ciberseguridad.crear();
+        CiberseguridadDeteminista afdQuemado = CiberseguridadDeteminista.crear();
+        AFD afdTransformado = TransformadorAFN_AFD.transformar(afn);
+        AFD afdMinimizado = MinimizadorAFD.minimizar(afdTransformado);
 
-    private static void pruebasEcommerce() {
-        Ecommerce ecommerce = Ecommerce.crear();
-        
-        prueba(ecommerce, new String[]{"HOME", "SEARCH", "CART"}, true, "Flujo de compra completo");
-        prueba(ecommerce, new String[]{"HOME", "CART"}, false, "No se puede ir al carrito sin buscar");
-        prueba(ecommerce, new String[]{"HOME", "SEARCH", "SEARCH", "CART"}, true, "Búsquedas múltiples permitidas");
-    }
+        String[][] cadenas = {
+            {"SYN", "ACK", "RST"},
+            {"SYN", "ACK", "ACK", "RST"},
+            {"SYN", "DATA", "RST"},
+            {"ACK", "RST"}
+        };
 
-    private static void pruebasLecturasIoT() {
-        LecturasIoT iot = LecturasIoT.crear();
-        
-        prueba(iot, new String[]{"HDR", "TEMP", "HUM", "CRC"}, true, "Patrón válido: HDR TEMP HUM CRC");
-        prueba(iot, new String[]{"HDR", "TEMP", "TEMP", "HUM", "CRC"}, true, "Múltiples TEMP y HUM permitidos");
-        prueba(iot, new String[]{"HDR", "CRC"}, false, "CRC sin datos intermedios rechazado");
-        prueba(iot, new String[]{"TEMP", "HUM", "CRC"}, false, "Sin HDR inicial rechazado");
-        prueba(iot, new String[]{"HDR", "HUM", "HUM", "CRC"}, true, "Patrón válido: HDR HUM HUM CRC");
-    }
+        String[] descripciones = {
+            "Three-way handshake básico",
+            "Múltiples ACKs (no determinismo)",
+            "DATA no permitido",
+            "Sin SYN inicial"
+        };
 
-    private static void prueba(AFN automata, String[] cadena, boolean esperado, String descripcion) {
-        boolean resultado = automata.esValida(cadena);
-        String estado = resultado == esperado ? "✓ CORRECTO" : "✗ ERROR";
-        
-        System.out.println(estado + " | " + descripcion);
-        System.out.println("  Entrada: " + java.util.Arrays.toString(cadena));
-        System.out.println("  Esperado: " + esperado + " | Obtenido: " + resultado);
+        System.out.println("Información de autómatas:");
+        System.out.println("  AFN: " + afn.getNombre() + " (" + afn.getEstados().size() + " estados)");
+        System.out.println("  AFD Quemado: " + afdQuemado.getNombre() + " (" + afdQuemado.getEstados().size() + " estados)");
+        System.out.println("  AFD Transformado: " + afdTransformado.getNombre() + " (" + afdTransformado.getEstados().size() + " estados)");
+        System.out.println("  AFD Minimizado: " + afdMinimizado.getNombre() + " (" + afdMinimizado.getEstados().size() + " estados)");
         System.out.println();
+
+        for (int i = 0; i < cadenas.length; i++) {
+            boolean afnResult = afn.esValida(cadenas[i]);
+            boolean afdQuemadoResult = afdQuemado.esValida(cadenas[i]);
+            boolean afdTransformadoResult = afdTransformado.esValida(cadenas[i]);
+            boolean afdMinimizadoResult = afdMinimizado.esValida(cadenas[i]);
+
+            boolean todasIguales = (afnResult == afdQuemadoResult) && (afdQuemadoResult == afdTransformadoResult) && (afdTransformadoResult == afdMinimizadoResult);
+            String match = todasIguales ? "✓" : "✗";
+
+            System.out.println(match + " | " + descripciones[i]);
+            System.out.println("  Cadena: " + java.util.Arrays.toString(cadenas[i]));
+            System.out.println("  AFN: " + afnResult + " | AFD Quemado: " + afdQuemadoResult + " | AFD Transformado: " + afdTransformadoResult + " | AFD Minimizado: " + afdMinimizadoResult);
+            System.out.println();
+        }
     }
 }
 

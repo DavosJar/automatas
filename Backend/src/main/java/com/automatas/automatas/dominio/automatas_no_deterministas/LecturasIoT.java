@@ -1,4 +1,4 @@
-package com.automatas.automatas.dominio.automatas;
+package com.automatas.automatas.dominio.automatas_no_deterministas;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
