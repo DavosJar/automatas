@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ValidadorReact from '../components/ValidadorReact.jsx';
+
+const ejemplos = [
+  { nombre: '3-Way básico', simbolos: ['SYN', 'ACK', 'RST'], esperado: true },
+  { nombre: 'ACK múltiple', simbolos: ['SYN', 'ACK', 'ACK', 'RST'], esperado: true },
+  { nombre: 'Más ACKs', simbolos: ['SYN', 'ACK', 'ACK', 'ACK', 'RST'], esperado: true },
+  { nombre: 'Sin SYN', simbolos: ['ACK', 'RST'], esperado: false },
+  { nombre: 'Solo SYN', simbolos: ['SYN'], esperado: false },
+  { nombre: 'Inválido', simbolos: ['DATA'], esperado: false },
+  { nombre: 'Orden invertida', simbolos: ['RST', 'ACK', 'SYN'], esperado: false },
+  { nombre: 'Incompleto', simbolos: ['SYN', 'ACK'], esperado: false },
+];
+---
+
+<Layout title="Ciberseguridad">
+  <h1>Ciberseguridad - TCP 3-way Handshake</h1>
+  
+  <div class="page-intro">
+    <p>Valida la secuencia correcta del apretón de manos TCP. Los estados y transiciones se cargan dinámicamente del backend.</p>
+  </div>
+  
+  <ValidadorReact tipo="ciberseguridad" nombre="Ciberseguridad" ejemplos={ejemplos} client:load />
+</Layout>

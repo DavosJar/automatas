@@ -1,0 +1,531 @@
+---
+interface Props {
+  tipo: string;
+  ejemplos: Array<{nombre: string; simbolos: string[]; esperado: boolean}>;
+}
+
+const { tipo, ejemplos } = Astro.props;
+const tituloMap = {
+  ciberseguridad: 'Ciberseguridad (TCP 3-way Handshake)',
+  iot: 'Lecturas IoT (HDR...CRC)',
+  ecommerce: 'E-commerce (Flujo de compra)'
+};
+---
+
+<div class="automata-card">
+  <h2>{tituloMap[tipo]}</h2>
+  
+  <div class="content">
+    <div class="form-section">
+      <h3>Validación Personalizada</h3>
+      <form id={`form-${tipo}`} class="form">
+        <input
+          type="text"
+          id={`input-${tipo}`}
+          placeholder="Ej: SYN,ACK,RST"
+          required
+        />
+        <button type="submit" class="btn-submit">Validar</button>
+      </form>
+   automata-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px;
+  }
+  
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    border-bottom: 4px solid #667eea;
+    padding-bottom: 12px;
+  }
+  
+  h3 {
+    color: #34495e;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+  }
+  
+  .form-section, .ejemplos-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form {
+    display: flex;
+    gap: 10px;
+  }
+  
+  input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .btn-submit {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  }
+  
+  .ejemplos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  
+  .ejemplo-btn {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  
+  .ejemplo-btn.aceptacion {
+    border-color: #4caf50;
+    background: #e8f5e9;
+    color: #2e7d32;
+  // Validar con formulario
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById(`input-${tipo}`);
+    const simbolos = input.value
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    if (simbolos.length === 0) {
+      mostrarError('Por favor ingresa símbolos válidos');
+      return;
+    }
+
+    await validarYMostrar(simbolos, input.value);
+  });
+
+  // Validar con ejemplos
+  document.querySelectorAll(`.ejemplo-btn[data-tipo="${tipo}"]`).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const simbolos = btn.dataset.simbolos.split(',');
+      const nombre = btn.dataset.nombre;
+      await validarYMostrar(simbolos, nombre);
+    });
+  });
+
+  async function validarYMostrar(simbolos, label) {
+    resultadoDiv.innerHTML = '<div class="loading"><span>⏳ Validando...</span></div>';
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/automatas/${tipo}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(simbolos)
+      });
+
+      if (!response.ok) {
+        mostrarError(`Error ${response.status}`);
+        return;
+      }
+
+      const data = await response.json();
+      mostrarResultado(data, label, simbolos);
+    } catch (error) {
+      mostrarError(error.message);
+    }
+  }
+
+  function mostrarError(msg) {
+    resultadoDiv.innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
+  }
+
+  function mostrarResultado(data, label, simbolos) {
+    const cadena = simbolos.join(' → ');
+    const coinciden = data.validoAFN === data.validoAFDTransformado && data.validoAFDTransformado === data.validoAFDMinimizado;
+    
+    const html = `
+      <div class="resultado-content">
+        <div class="cadena-info">
+          <h4>Cadena Validada</h4>
+          <p class="cadena">${cadena}</p>
+          <p class="label">${label}</p>
+        </div>
+        
+        <div class="validaciones">
+          <div class="val-item ${data.validoAFN ? 'valido' : 'invalido'}">
+            <span class="icon">${data.validoAFN ? '✅' : '❌'}</span>
+            <div>
+              <strong>AFN</strong>
+              <span>${data.validoAFN ? 'Aceptada' : 'Rechazada'}</span>
+            </div>
+          </div>
+          <div class="val-item ${data.validoAFDTransformado ? 'valido' : 'invalido'}">
+            <span class="icon">${data.validoAFDTransformado ? '✅' : '❌'}</span>
+            <div>
+              <strong>AFD Transformado</strong>
+              <span>${data.validoAFDTransformado ? 'Aceptada' : 'Rechazada'}</span>
+            </div>
+          </div>
+          <div class="val-item ${data.validoAFDMinimizado ? 'valido' : 'invalido'}">
+            <span class="icon">${data.validoAFDMinimizado ? '✅' : '❌'}</span>
+            <div>
+              <strong>AFD Minimizado</strong>
+              <span>${data.validoAFDMinimizado ? 'Aceptada' : 'Rechazada'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="consistency ${coinciden ? 'ok' : 'warning'}">
+          ${coinciden ? '✓ Todos los autómatas coinciden' : '⚠ Los autómatas no coinciden'}
+        </div>
+        
+        <div class="tablas">
+          ${mostrarTabla(data.afn, 'AFN')}
+          ${mostrarTabla(data.afdTransformado, 'AFD Transformado')}
+          ${mostrarTabla(data.afdMinimizado, 'AFD Minimizado')}
+        </div>
+      </div>
+    `;
+    resultadoDiv.innerHTML = html;
+  }
+
+  function mostrarTabla(automata, nombre) {
+    const rows = Object.entries(automata.tablaTransiciones)
+   loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+  }
+
+  .error-msg {
+    background: #ffebee;
+    color: #c62828;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #f44336;
+    font-weight: 500;
+  }
+
+  .cadena-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .cadena-info h4 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+
+  .cadena {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+
+  .cadena-info .label {
+    margin: 10px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .validaciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .val-item {
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .val-item.valido {
+    background: #e8f5e9;
+    border: 2px solid #4caf50;
+  }
+
+  .val-item.invalido {
+    background: #ffebee;
+    border: 2px solid #f44336;
+  }
+
+  .val-item .icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+
+  .val-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .val-item strong {
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  .val-item span {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .consistency {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .consistency.ok {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #4caf50;
+  }
+
+  .consistency.warning {
+    background: #fff3e0;
+    color: #e65100;
+    border-left: 4px solid #ff9800;
+  }
+
+  .tablas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+  }
+
+  .tabla-wrapper {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .tabla-wrapper h4 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+  }
+
+  .meta-info {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #666;
+    flex-wrap: wrap;
+  }
+
+  .meta-info code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: #d63031;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: #667eea;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    border-radius: 4px 4px 0 0;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .estado-cell {
+    font-weight: 600;
+    color: #667eea;
+    font-family: 'Courier New', monospace;
+  }
+
+  .trans {
+    background: #e8eaf6;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+    display: inline-block;
+    margin-bottom: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+  }
+
+  tr:hover {
+    background: #f0f0f0;
+  }
+
+  @media (max-width: 1024px) {
+    .tablas {
+      grid-template-columns: 1fr;
+    }
+
+    return `
+      <div class="tabla-wrapper">
+        <h3>${nombre}</h3>
+        <p class="meta">Estados: ${automata.estados.size} | Inicial: ${automata.estadoInicial}</p>
+        <table>
+          <thead>
+            <tr><th>Estado</th><th>Transiciones</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+</script>
+
+<style>
+  .resultado-content {
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .validaciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .val-item {
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+
+  .val-item.valido {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 2px solid #4caf50;
+  }
+
+  .val-item.invalido {
+    background: #ffebee;
+    color: #c62828;
+    border: 2px solid #f44336;
+  }
+
+  .icon {
+    font-size: 1.5rem;
+  }
+
+  .tablas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+  }
+
+  .tabla-wrapper {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+  }
+
+  .tabla-wrapper h3 {
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+
+  .meta {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    background: #667eea;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+  }
+
+  tr:hover {
+    background: #eeeeee;
+  }
+</style>

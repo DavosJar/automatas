@@ -1,0 +1,147 @@
+---
+type Props = {
+  title: string;
+};
+
+const { title } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <style is:global>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #0f0f1e;
+        min-height: 100vh;
+        color: #e0e0e0;
+      }
+      
+      .navbar {
+        background: rgba(15, 15, 30, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 16px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+      }
+      
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .nav-brand {
+        font-size: 1.3rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+        letter-spacing: -0.5px;
+      }
+      
+      .nav-links {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+      }
+      
+      .nav-links a {
+        color: #a0a0b8;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+      }
+      
+      .nav-links a:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #e0e0ff;
+      }
+      
+      .nav-links a.active {
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      
+      h1 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 16px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      
+      .page-intro {
+        background: rgba(102, 126, 234, 0.08);
+        color: #b0b0c8;
+        padding: 20px 24px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        font-size: 0.95rem;
+        border: 1px solid rgba(102, 126, 234, 0.15);
+        line-height: 1.6;
+      }
+      
+      @media (max-width: 768px) {
+        .nav-links {
+          flex-direction: column;
+          gap: 4px;
+        }
+        
+        h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">Autómatas</a>
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Inicio</a></li>
+          <li><a href="/ciberseguridad" class="nav-link">Ciberseguridad</a></li>
+          <li><a href="/iot" class="nav-link">IoT</a></li>
+          <li><a href="/ecommerce" class="nav-link">E-commerce</a></li>
+        </ul>
+      </div>
+    </nav>
+    
+    <div class="container">
+      <slot />
+    </div>
+
+    <script>
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    </script>
+  </body>
+</html>
