@@ -3,23 +3,19 @@ import Layout from '../layouts/Layout.astro';
 import ValidadorReact from '../components/ValidadorReact.jsx';
 
 const ejemplos = [
-  { nombre: 'Compra simple', simbolos: ['LOGIN', 'BROWSE', 'BUY', 'PAY', 'LOGOUT'], esperado: true },
-  { nombre: 'Múltiples compras', simbolos: ['LOGIN', 'BROWSE', 'BUY', 'BROWSE', 'BUY', 'PAY', 'LOGOUT'], esperado: true },
-  { nombre: 'Con carrito', simbolos: ['LOGIN', 'BROWSE', 'CART', 'BUY', 'PAY', 'LOGOUT'], esperado: true },
-  { nombre: 'Más navegación', simbolos: ['LOGIN', 'BROWSE', 'BROWSE', 'BUY', 'PAY', 'LOGOUT'], esperado: true },
-  { nombre: 'Sin login', simbolos: ['BROWSE', 'BUY', 'PAY', 'LOGOUT'], esperado: false },
-  { nombre: 'Sin logout', simbolos: ['LOGIN', 'BROWSE', 'BUY', 'PAY'], esperado: false },
-  { nombre: 'Pagar sin comprar', simbolos: ['LOGIN', 'BROWSE', 'PAY', 'LOGOUT'], esperado: false },
-  { nombre: 'Orden invertida', simbolos: ['LOGOUT', 'PAY', 'BUY', 'BROWSE', 'LOGIN'], esperado: false },
+  { nombre: 'Flujo básico',          simbolos: ['HOME', 'SEARCH', 'CART'],                          esperado: true  },
+  { nombre: 'Búsqueda múltiple',     simbolos: ['HOME', 'SEARCH', 'SEARCH', 'CART'],                esperado: true  },
+  { nombre: 'Volver a inicio',       simbolos: ['HOME', 'HOME', 'SEARCH', 'CART'],                  esperado: true  },
+  { nombre: 'Varios ítems',          simbolos: ['HOME', 'SEARCH', 'CART', 'SEARCH', 'CART'],        esperado: true  },
+  { nombre: 'Sin HOME',              simbolos: ['SEARCH', 'CART'],                                  esperado: false },
+  { nombre: 'Sin SEARCH',            simbolos: ['HOME', 'CART'],                                    esperado: false },
+  { nombre: 'Orden invertido',       simbolos: ['CART', 'SEARCH', 'HOME'],                          esperado: false },
+  { nombre: 'Sin CART',              simbolos: ['HOME', 'SEARCH'],                                  esperado: false },
 ];
 ---
 
 <Layout title="E-commerce">
   <h1>E-commerce - Flujo de Compra</h1>
-  
-  <div class="page-intro">
-    <p>Valida el flujo completo de una transacción de compra en línea. Los estados y transiciones se cargan dinámicamente del backend.</p>
-  </div>
   
   <ValidadorReact tipo="ecommerce" nombre="E-commerce" ejemplos={ejemplos} client:load />
 </Layout>

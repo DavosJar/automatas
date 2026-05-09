@@ -70,7 +70,6 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
           color: '#667eea',
           fontSize: '1.1rem'
         }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>⏳</div>
           Cargando estructura del autómata...
         </div>
       )}
@@ -111,8 +110,7 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
                   color: ej.esperado ? '#2e7d32' : '#c62828'
                 }}
               >
-                <span style={{ fontSize: '1.2rem' }}>{ej.esperado ? '✅' : '❌'}</span>
-                <span>{ej.nombre}</span>
+                <span style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{ej.simbolos.join(', ')}</span>
               </button>
             ))}
           </div>
@@ -154,7 +152,7 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
                   fontSize: '0.95rem'
                 }}
               >
-                {loading ? '⏳' : 'Validar'}
+                {loading ? 'Validando...' : 'Validar'}
               </button>
             </form>
           </div>
@@ -181,7 +179,6 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
           color: '#667eea',
           fontSize: '1.1rem'
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
           Validando cadena...
         </div>
       )}
@@ -197,15 +194,15 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '4px' }}>CADENA VALIDADA</div>
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '4px', color: '#000', fontWeight: 'bold' }}>CADENA VALIDADA</div>
                 <div style={{ fontFamily: 'monospace', fontSize: '1.2rem', fontWeight: 600 }}>
                   {activeExample || input}
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '4px' }}>ESTADO</div>
+                <div style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '4px', color: '#000', fontWeight: 'bold' }}>ESTADO</div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                  {coinciden ? '✓ Consistente' : '⚠ Inconsistente'}
+                  {coinciden ? 'Consistente' : 'Inconsistente'}
                 </div>
               </div>
             </div>
@@ -237,7 +234,6 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
                   padding: '16px',
                   textAlign: 'center'
                 }}>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{valid ? '✅' : '❌'}</div>
                   <div style={{ fontWeight: 600, color: '#333', fontSize: '0.9rem' }}>{name}</div>
                   <div style={{ color: valid ? '#2e7d32' : '#c62828', fontSize: '0.85rem', marginTop: '4px' }}>
                     {valid ? 'Aceptada' : 'Rechazada'}
@@ -250,23 +246,26 @@ export default function ValidadorReact({ tipo, nombre, ejemplos }) {
           <AutomataComparison resultado={resultado} tipo={tipo} />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <h3 style={{ margin: '0', color: '#2c3e50', fontSize: '1rem' }}>
+            <h3 style={{ margin: '0', color: '#ffffff', fontSize: '1.1rem', fontWeight: 700 }}>
               Ver Estados por Nivel
             </h3>
             <AutomataVisualization
               automata={resultado.afn}
               title="AFN (No Determinista)"
               color="#e74c3c"
+              cadena={input.split(',').map(s => s.trim()).filter(s => s)}
             />
             <AutomataVisualization
               automata={resultado.afdTransformado}
               title="AFD Transformado (Determinista)"
               color="#3498db"
+              cadena={input.split(',').map(s => s.trim()).filter(s => s)}
             />
             <AutomataVisualization
               automata={resultado.afdMinimizado}
               title="AFD Minimizado (Óptimo)"
               color="#2ecc71"
+              cadena={input.split(',').map(s => s.trim()).filter(s => s)}
             />
           </div>
         </div>

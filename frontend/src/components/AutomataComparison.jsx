@@ -38,8 +38,8 @@ export default function AutomataComparison({ resultado, tipo }) {
             style={{
               padding: '8px 16px',
               border: 'none',
-              background: activeTab === tab ? '#667eea' : 'transparent',
-              color: activeTab === tab ? 'white' : '#666',
+              background: activeTab === tab ? '#667eea' : '#e2e8f0',
+              color: activeTab === tab ? 'white' : '#1e293b',
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 600,
@@ -47,7 +47,7 @@ export default function AutomataComparison({ resultado, tipo }) {
               textTransform: 'capitalize'
             }}
           >
-            {tab === 'table' ? '📊 Tabla' : tab === 'transitions' ? '🔄 Transiciones' : '⚖️ Comparación'}
+            {tab === 'table' ? 'Tabla' : tab === 'transitions' ? 'Transiciones' : 'Comparación'}
           </button>
         ))}
       </div>
@@ -63,7 +63,7 @@ export default function AutomataComparison({ resultado, tipo }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ background: '#f5f5f5' }}>
-                <th style={{ padding: '12px', textAlign: 'left', color: '#666' }}>Métrica</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#000', fontWeight: 700 }}>Métrica</th>
                 <th style={{ padding: '12px', textAlign: 'center', color: '#e74c3c' }}>AFN</th>
                 <th style={{ padding: '12px', textAlign: 'center', color: '#3498db' }}>AFD Transformado</th>
                 <th style={{ padding: '12px', textAlign: 'center', color: '#2ecc71' }}>AFD Minimizado</th>
@@ -85,9 +85,9 @@ export default function AutomataComparison({ resultado, tipo }) {
               ))}
               <tr style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '10px', fontWeight: 600, color: '#333' }}>Validación</td>
-                <td style={{ padding: '10px', textAlign: 'center', fontSize: '1.2rem' }}>{validoAFN ? '✅' : '❌'}</td>
-                <td style={{ padding: '10px', textAlign: 'center', fontSize: '1.2rem' }}>{validoAFDTransformado ? '✅' : '❌'}</td>
-                <td style={{ padding: '10px', textAlign: 'center', fontSize: '1.2rem' }}>{validoAFDMinimizado ? '✅' : '❌'}</td>
+                <td style={{ padding: '10px', textAlign: 'center', fontWeight: 700, color: validoAFN ? '#2e7d32' : '#c62828' }}>{validoAFN ? 'OK' : 'NO'}</td>
+                <td style={{ padding: '10px', textAlign: 'center', fontWeight: 700, color: validoAFDTransformado ? '#2e7d32' : '#c62828' }}>{validoAFDTransformado ? 'OK' : 'NO'}</td>
+                <td style={{ padding: '10px', textAlign: 'center', fontWeight: 700, color: validoAFDMinimizado ? '#2e7d32' : '#c62828' }}>{validoAFDMinimizado ? 'OK' : 'NO'}</td>
               </tr>
             </tbody>
           </table>
@@ -103,7 +103,6 @@ export default function AutomataComparison({ resultado, tipo }) {
             alignItems: 'center',
             gap: '8px'
           }}>
-            {coinciden ? '✓' : '⚠'} 
             {coinciden ? 'Todos los niveles coinciden en la validación' : 'Inconsistencia detectada entre niveles'}
           </div>
         </div>
@@ -148,7 +147,7 @@ function TransitionCard({ title, color, automata }) {
           <span style={{ color, marginRight: '6px' }}>●</span>
           {title}
         </h4>
-        <span style={{ fontSize: '0.8rem', color: '#999' }}>{expanded ? '▲' : '▼'}</span>
+        <span style={{ fontSize: '0.8rem', color: '#000', fontWeight: 700 }}>{expanded ? '▲' : '▼'}</span>
       </div>
 
       <div style={{
@@ -160,12 +159,13 @@ function TransitionCard({ title, color, automata }) {
         {estados.map(e => (
           <span key={e} style={{
             background: estadosAceptacion.includes(e) ? '#e8f5e9' : '#f0f0f0',
-            color: estadosAceptacion.includes(e) ? '#4caf50' : '#333',
+            color: estadosAceptacion.includes(e) ? '#2e7d32' : '#000',
             padding: '4px 10px',
             borderRadius: '4px',
             fontSize: '0.85rem',
             fontFamily: 'monospace',
-            border: estadosAceptacion.includes(e) ? '1px solid #4caf50' : '1px solid #ddd'
+            fontWeight: 700,
+            border: estadosAceptacion.includes(e) ? '1px solid #4caf50' : '1px solid #bbb'
           }}>
             {e}
           </span>
@@ -182,15 +182,18 @@ function TransitionCard({ title, color, automata }) {
               gap: '8px',
               alignItems: 'center'
             }}>
-              <span style={{ fontFamily: 'monospace', fontWeight: 600, minWidth: '60px' }}>{estado}</span>
-              <span style={{ color: '#999' }}>→</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 700, minWidth: '60px', color: '#000' }}>{estado}</span>
+              <span style={{ color: '#333', fontWeight: 700 }}>→</span>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {Object.entries(trans || {}).map(([s, d]) => (
                   <span key={s} style={{
-                    background: '#f5f5f5',
+                    background: '#e2e8f0',
+                    color: '#000',
                     padding: '2px 8px',
                     borderRadius: '4px',
-                    fontSize: '0.8rem'
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    fontFamily: 'monospace'
                   }}>
                     {s}→{Array.isArray(d) ? d.join(',') : d}
                   </span>
@@ -230,18 +233,18 @@ function ComparisonView({ afn, afd, minimized }) {
       }}>
         <div style={{ background: '#ffebee', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: '#e74c3c' }}>{afnStates.length}</div>
-          <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>AFN - Estados Iniciales</div>
+          <div style={{ fontSize: '0.85rem', color: '#000', marginTop: '4px' }}>AFN - Estados Iniciales</div>
         </div>
         <div style={{ background: '#e3f2fd', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: '#3498db' }}>{afdStates.length}</div>
-          <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>AFD - Tras Transformar</div>
+          <div style={{ fontSize: '0.85rem', color: '#000', marginTop: '4px' }}>AFD - Tras Transformar</div>
           <div style={{ fontSize: '0.9rem', color: '#3498db', fontWeight: 600, marginTop: '8px' }}>
             {reduction1 > 0 ? `↓ ${reduction1}%` : `↑ ${Math.abs(reduction1)}%`}
           </div>
         </div>
         <div style={{ background: '#e8f5e9', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: '#2ecc71' }}>{minStates.length}</div>
-          <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>AFD - Minimizado</div>
+          <div style={{ fontSize: '0.85rem', color: '#000', marginTop: '4px' }}>AFD - Minimizado</div>
           <div style={{ fontSize: '0.9rem', color: '#2ecc71', fontWeight: 600, marginTop: '8px' }}>
             ↓ {totalReduction}% del total
           </div>
@@ -253,24 +256,24 @@ function ComparisonView({ afn, afd, minimized }) {
         padding: '16px',
         borderRadius: '8px'
       }}>
-        <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '12px', fontWeight: 600 }}>
+        <div style={{ fontSize: '0.85rem', color: '#000', marginBottom: '12px', fontWeight: 700 }}>
           DIFERENCIAS PRINCIPALES
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
             <span style={{ color: '#e74c3c', fontSize: '1.2rem' }}>●</span>
-            <strong>AFN:</strong> 
-            <span>Puede tener múltiples estados destino (no determinista)</span>
+            <strong style={{ color: '#000' }}>AFN:</strong> 
+            <span style={{ color: '#000' }}>Puede tener múltiples estados destino (no determinista)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
             <span style={{ color: '#3498db', fontSize: '1.2rem' }}>●</span>
-            <strong>AFD Transformado:</strong> 
-            <span>Super-estados que agrupan estados del AFN (determinista)</span>
+            <strong style={{ color: '#000' }}>AFD Transformado:</strong> 
+            <span style={{ color: '#000' }}>Super-estados que agrupan estados del AFN (determinista)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
             <span style={{ color: '#2ecc71', fontSize: '1.2rem' }}>●</span>
-            <strong>AFD Minimizado:</strong> 
-            <span>Estados equivalentes unidos (mínimo posible)</span>
+            <strong style={{ color: '#000' }}>AFD Minimizado:</strong> 
+            <span style={{ color: '#000' }}>Estados equivalentes unidos (mínimo posible)</span>
           </div>
         </div>
       </div>
