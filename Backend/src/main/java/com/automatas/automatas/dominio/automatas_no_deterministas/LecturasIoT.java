@@ -23,45 +23,28 @@ public class LecturasIoT extends AFN {
 
     public static LecturasIoT crear() {
         Set<String> alfabeto = new LinkedHashSet<>(Arrays.asList("HDR", "TEMP", "HUM", "CRC"));
-        Set<String> estados = new LinkedHashSet<>(Arrays.asList("q0", "q1", "q2", "q3", "q_fallo"));
+        Set<String> estados = new LinkedHashSet<>(Arrays.asList("q0", "q1", "q2", "q3"));
         Set<String> estadosAceptacion = new LinkedHashSet<>(Arrays.asList("q3"));
 
         Map<String, Map<String, Set<String>>> tablaTransiciones = new LinkedHashMap<>();
 
         tablaTransiciones.put("q0", new LinkedHashMap<String, Set<String>>() {{
             put("HDR", new LinkedHashSet<>(Arrays.asList("q1")));
-            put("TEMP", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("HUM", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("CRC", new LinkedHashSet<>(Arrays.asList("q_fallo")));
         }});
 
         tablaTransiciones.put("q1", new LinkedHashMap<String, Set<String>>() {{
-            put("HDR", new LinkedHashSet<>(Arrays.asList("q_fallo")));
             put("TEMP", new LinkedHashSet<>(Arrays.asList("q1", "q2")));
             put("HUM", new LinkedHashSet<>(Arrays.asList("q1", "q2")));
-            put("CRC", new LinkedHashSet<>(Arrays.asList("q2")));
+            put("CRC", new LinkedHashSet<>(Arrays.asList("q3")));
         }});
 
         tablaTransiciones.put("q2", new LinkedHashMap<String, Set<String>>() {{
-            put("HDR", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("TEMP", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("HUM", new LinkedHashSet<>(Arrays.asList("q_fallo")));
             put("CRC", new LinkedHashSet<>(Arrays.asList("q3")));
         }});
 
         tablaTransiciones.put("q3", new LinkedHashMap<String, Set<String>>() {{
-            put("HDR", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("TEMP", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("HUM", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("CRC", new LinkedHashSet<>(Arrays.asList("q_fallo")));
         }});
 
-        tablaTransiciones.put("q_fallo", new LinkedHashMap<String, Set<String>>() {{
-            put("HDR", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("TEMP", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("HUM", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-            put("CRC", new LinkedHashSet<>(Arrays.asList("q_fallo")));
-        }});
 
         return new LecturasIoT(
             "LecturasIoT",
