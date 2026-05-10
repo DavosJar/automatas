@@ -9,8 +9,33 @@ import com.automatas.automatas.dominio.automatas_no_deterministas.LecturasIoT;
 import com.automatas.automatas.dominio.operaciones.MinimizadorAFD;
 import com.automatas.automatas.dominio.operaciones.TransformadorAFN_AFD;
 
+/**
+ * Clase principal para comparación de autómatas desde línea de comandos
+ * 
+ * Esta clase ejecuta el pipeline completo para tres casos de uso:
+ * 1. Ciberseguridad: Protocolo de handshake (SYN, ACK, DATA, RST)
+ * 2. E-commerce: Flujo de compra (HOME, SEARCH, CART)
+ * 3. Lecturas IoT: Sensores de temperatura/humedad (HDR, TEMP, HUM, CRC)
+ * 
+ * Para cada caso:
+ * - Crea el AFN
+ * - Transforma a AFD
+ * - Minimiza el AFD
+ * - Valida 20 cadenas frontera
+ * - Compara resultados (deben ser idénticos)
+ * - Imprime tabla en consola
+ * 
+ * @author Proyecto Autómatas
+ * @version 1.0
+ */
 public class Main {
 
+    /**
+     * Punto de entrada del programa.
+     * Ejecuta la comparación de los 3 autómatas.
+     * 
+     * @param args No se utilizan argumentos
+     */
     public static void main(String[] args) {
         System.out.println("=== COMPARATIVA: AFN vs AFD vs AFD MINIMIZADO ===\n");
 
@@ -25,6 +50,18 @@ public class Main {
         }
     }
 
+    /**
+     * Imprime una comparativa de validación para un caso de autómata.
+     * 
+     * Crea una tabla con:
+     * - Cada cadena a probar
+     * - Resultado en AFN
+     * - Resultado en AFD transformado
+     * - Resultado en AFD minimizado
+     * - Contador de coincidencias
+     * 
+     * @param caso El caso de comparación con AFN y cadenas de prueba
+     */
     private static void imprimirComparativa(CasoComparacion caso) {
         AFD afd = TransformadorAFN_AFD.transformar(caso.afn);
         AFD afdMinimizado = MinimizadorAFD.minimizar(afd);
@@ -65,10 +102,22 @@ public class Main {
         System.out.println();
     }
 
+    /**
+     * Convierte un resultado booleano a string legible.
+     * 
+     * @param valor true o false
+     * @return "ACEPTA" si es true, "RECHAZA" si es false
+     */
     private static String formatearResultado(boolean valor) {
         return valor ? "ACEPTA" : "RECHAZA";
     }
 
+    /**
+     * Convierte un array de símbolos a string para mostrar en tabla.
+     * 
+     * @param cadena Array de símbolos
+     * @return String con símbolos separados por espacios, o "ε" si está vacía
+     */
     private static String formatearCadena(String[] cadena) {
         if (cadena.length == 0) {
             return "ε";
@@ -77,6 +126,12 @@ public class Main {
         return String.join(" ", cadena);
     }
 
+    /**
+     * Dibuja la línea horizontal de borde de la tabla.
+     * 
+     * @param anchos Array con el ancho de cada columna
+     * @return String con el borde (+-+---+-...)
+     */
     private static String renderBorder(int[] anchos) {
         StringBuilder borde = new StringBuilder();
         borde.append('+');
@@ -88,6 +143,13 @@ public class Main {
         return borde.toString();
     }
 
+    /**
+     * Dibuja una fila de la tabla con contenido alineado.
+     * 
+     * @param anchos Array con el ancho de cada columna
+     * @param valores Contenido de cada celda
+     * @return String con la fila formateada
+     */
     private static String renderRow(int[] anchos, String... valores) {
         StringBuilder fila = new StringBuilder();
         fila.append('|');
@@ -99,6 +161,13 @@ public class Main {
         return fila.toString();
     }
 
+    /**
+     * Ajusta un string a un ancho específoco rellenando con espacios.
+     * 
+     * @param valor String a ajustar
+     * @param ancho Ancho deseado
+     * @return String ajustado (truncado o rellenado)
+     */
     private static String ajustar(String valor, int ancho) {
         if (valor.length() >= ancho) {
             return valor.substring(0, ancho);
@@ -112,6 +181,13 @@ public class Main {
         return ajustado.toString();
     }
 
+    /**
+     * Repite un carácter un número determinado de veces.
+     * 
+     * @param caracter El carácter a repetir
+     * @param cantidad Número de repeticiones
+     * @return String con los caracteres repetidos
+     */
     private static String repetir(char caracter, int cantidad) {
         StringBuilder repetido = new StringBuilder();
         for (int i = 0; i < cantidad; i++) {
@@ -121,6 +197,16 @@ public class Main {
         return repetido.toString();
     }
 
+    /**
+     * Proporciona 20 cadenas frontera para el autómata de Ciberseguridad.
+     * 
+     * Incluye:
+     * - Cadena vacía (ε)
+     * - Prefijos correctos e incorrectos
+     * - Secuencias válidas e inválidas
+     * 
+     * @return Lista de 20 cadenas de prueba
+     */
     private static List<String[]> cadenasCiberseguridad() {
         return Arrays.asList(
             new String[] {},
@@ -146,6 +232,16 @@ public class Main {
         );
     }
 
+    /**
+     * Proporciona 20 cadenas frontera para el autómata de E-commerce.
+     * 
+     * Incluye:
+     * - Cadena vacía (ε)
+     * - Caminos incompletos
+     * - Secuencias válidas e inválidas
+     * 
+     * @return Lista de 20 cadenas de prueba
+     */
     private static List<String[]> cadenasEcommerce() {
         return Arrays.asList(
             new String[] {},
@@ -171,6 +267,16 @@ public class Main {
         );
     }
 
+    /**
+     * Proporciona 20 cadenas frontera para el autómata de IoT.
+     * 
+     * Incluye:
+     * - Cadena vacía (ε)
+     * - Múltiples lecturas de sensores
+     * - Secuencias válidas e inválidas
+     * 
+     * @return Lista de 20 cadenas de prueba
+     */
     private static List<String[]> cadenasIoT() {
         return Arrays.asList(
             new String[] {},
@@ -196,6 +302,14 @@ public class Main {
         );
     }
 
+    /**
+     * Clase interna que agrupa información de un caso de comparación.
+     * 
+     * Contiene:
+     * - nombre: Descripción del caso
+     * - afn: El autómata finito no determinista
+     * - cadenas: Las 20 cadenas frontera para probar
+     */
     private static final class CasoComparacion {
         private final String nombre;
         private final AFN afn;

@@ -11,6 +11,24 @@ import java.util.TreeSet;
 import com.automatas.automatas.dominio.AFD;
 import com.automatas.automatas.dominio.AFN;
 
+/**
+ * Transformador de AFN a AFD
+ * 
+ * Esta clase implementa el algoritmo de construcción de subconjuntos (subset construction)
+ * para convertir un Autómata Finito No Determinista (AFN) en un Autómata Finito
+ * Determinista (AFD) equivalente.
+ * 
+ * Algoritmo:
+ * 1. El estado inicial del AFD es {q0} (el estado inicial del AFN)
+ * 2. Para cada superestado (conjunto de estados del AFN):
+ *    - Calcular el "mover" para cada símbolo del alfabeto
+ *    - Crear nuevos superestados si es necesario
+ * 3. Los estados de aceptación del AFD son aquellos superestados
+ *    que contienen al menos un estado de aceptación del AFN
+ * 
+ * @author Proyecto Autómatas
+ * @version 1.0
+ */
 public class TransformadorAFN_AFD {
 
     public static AFD transformar(AFN afn) {
