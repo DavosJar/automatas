@@ -12,6 +12,22 @@ import java.util.Stack;
 
 import com.automatas.automatas.dominio.AFD;
 
+/**
+ * Minimizador de Autómata Finito Determinista (AFD)
+ * 
+ * Esta clase implementa el algoritmo de minimización de Hopcroft para reducir
+ * un AFD a su forma mínima (menos estados) manteniendo el lenguaje aceptado.
+ * 
+ * Algoritmo (Tabla de Distinción):
+ * 1. Elimina estados inalcanzables (desde el estado inicial)
+ * 2. Marca pares de estados (aceptador, no-aceptador) como distinguibles
+ * 3. Itera propagando marcas hasta que no haya cambios
+ * 4. Agrupa estados no distinguibles
+ * 5. Construye el AFD minimizado usando representantes de grupos
+ * 
+ * @author Proyecto Autómatas
+ * @version 1.0
+ */
 public class MinimizadorAFD {
 
     public static AFD minimizar(AFD afd) {

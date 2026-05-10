@@ -7,15 +7,38 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Autómata Finito Determinista (AFD)
+ * 
+ * Esta clase modela un AFD donde cada transición es única: desde un estado
+ * y símbolo existe a lo más un estado destino. Es el resultado de transformar
+ * un AFN o puede ser creado directamente.
+ * 
+ * Características:
+ * - Tabla de transiciones: estado → símbolo → estado destino único
+ * - Validación determinística (un solo camino)
+ * - Estado trampa para rechazos rápidos
+ * - Inmutable (thread-safe)
+ * 
+ * @author Proyecto Autómatas
+ * @version 1.0
+ */
 public class AFD {
 
-    public static final String ESTADO_TRAMPA = "∅";
+    /** Estado especial que representa rechazo o falta de transición */
+    public static final String ESTADO_TRAMPA = "∞";
 
+    /** Identificador único del autómata */
     private final String nombre;
+    /** Conjunto de símbolos del alfabeto */
     private final Set<String> alfabeto;
+    /** Conjunto de todos los estados del autómata */
     private final Set<String> estados;
+    /** Estado inicial del autómata */
     private final String estadoInicial;
+    /** Estados de aceptación o finales */
     private final Set<String> estadosAceptacion;
+    /** Tabla de transiciones: estado → (símbolo → estado_destino) */
     private final Map<String, Map<String, String>> tablaTransiciones;
 
     public AFD(
@@ -58,30 +81,53 @@ public class AFD {
         return tablaTransiciones;
     }
 
+    /**
+     * Valida si una secuencia de símbolos es aceptada por este AFD.
+     * 
+     * Algoritmo:
+     * 1. Comienza en el estado inicial
+     * 2. Para cada símbolo:
+     *    - Busca la transición desde el estado actual
+     *    - Si no existe, va al estado trampa
+     *    - Si está en estado trampa, rechaza inmediatamente
+     * 3. Acepta si el estado final es de aceptación
+     * 
+     * @param simbolos Array de símbolos a validar
+     * @return true si la cadena es aceptada, false en caso contrario
+     * @throws NullPointerException si simbolos es null
+     */
     public boolean esValida(String[] simbolos) {
         Objects.requireNonNull(simbolos, "simbolos no puede ser nulo");
 
+        // Inicializar en estado inicial
         String estadoActual = estadoInicial;
 
+        // Procesar cada símbolo de la entrada (determinístico)
         for (String simbolo : simbolos) {
             Map<String, String> transiciones = tablaTransiciones.get(estadoActual);
 
+            // Si no hay transiciones desde el estado actual
             if (transiciones == null) {
                 estadoActual = ESTADO_TRAMPA;
             } else {
+                // Buscar transición con el símbolo
                 String estadoSiguiente = transiciones.get(simbolo);
                 if (estadoSiguiente == null) {
+                    // No existe transición, ir al estado trampa
                     estadoActual = ESTADO_TRAMPA;
                 } else {
+                    // Ejecutar transición
                     estadoActual = estadoSiguiente;
                 }
             }
 
+            // Si estamos en estado trampa, rechazar inmediatamente
             if (estadoActual.equals(ESTADO_TRAMPA)) {
                 return false;
             }
         }
 
+        // Aceptar si el estado final es de aceptación
         return estadosAceptacion.contains(estadoActual);
     }
 
